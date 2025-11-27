@@ -1,19 +1,16 @@
-# pacman_joystick.py
 import threading, serial, time, sys, math, random
 import pygame
 
-# ====== CONFIG ======
-SERIAL_PORT = "COM11"    # <-- change to your port (e.g. /dev/ttyACM0)
+SERIAL_PORT = "COM11" #change to your port
 BAUD = 9600
-DEADZONE = 80           # joystick deadzone around center (0..1023)
+DEADZONE = 80  #joystick deadzone around centre
 ANALOG_MIN = 0
 ANALOG_MAX = 1023
-SPEED = 120             # pixels per second
-BUTTON_SPEED_MULT = 1.6 # multiplier while button pressed
+SPEED = 120
+BUTTON_SPEED_MULT = 1.6 #multiplier while button pressed
 FPS = 60
-# =====================
 
-# Shared joystick state
+#shared joystick state
 joy = {"x": 512, "y": 512, "button": 1}
 running = True
 
@@ -55,7 +52,7 @@ def axis_value(a):
         return 0.0
     return max(-1.0, min(1.0, v))
 
-# ------------------ PYGAME GAME ------------------
+#using pygame
 pygame.init()
 CELL = 24
 COLS = 28
@@ -68,24 +65,24 @@ pygame.display.set_caption("Pac-Man (Arduino Joystick)")
 
 game_map = [[0 for _ in range(COLS)] for __ in range(ROWS)]
 
-# walls border
+#walls border
 for r in range(ROWS):
     for c in range(COLS):
         if r == 0 or r == ROWS-1 or c == 0 or c == COLS-1:
             game_map[r][c] = 1
-# interior walls
+#interior walls
 for r in range(4, ROWS-4, 2):
     for c in range(2, COLS-2):
         if (c % 4) != 0:
             game_map[r][c] = 1
 
-# pellets
+#pellets
 for r in range(ROWS):
     for c in range(COLS):
         if game_map[r][c] == 0:
             game_map[r][c] = 2
 
-# clear spawn zone
+#clear spawn zone
 for r in range(ROWS-4, ROWS-1):
     for c in range(2, 6):
         game_map[r][c] = 0
@@ -142,7 +139,7 @@ def try_move(px, py, dx, dy, dt, speed):
         return nx3, ny3
     return px, py
 
-# Start serial thread
+#start serial thread
 t = threading.Thread(target=serial_thread, args=(SERIAL_PORT, BAUD), daemon=True)
 t.start()
 
@@ -157,14 +154,12 @@ while running:
     ay = axis_value(joy["y"])
     btn = (joy["button"] == 0)
 
-    # ---- FIXED Y-AXIS (UP is UP, DOWN is DOWN) ----
     if abs(ax) > abs(ay):
         dx = math.copysign(1, ax) if abs(ax) > 0 else 0
         dy = 0
     else:
         dy = math.copysign(1, ay) if abs(ay) > 0 else 0
         dx = 0
-    # ------------------------------------------------
 
     move_speed = SPEED * (BUTTON_SPEED_MULT if btn else 1.0)
     player_pos[0], player_pos[1] = try_move(player_pos[0], player_pos[1], dx, dy, dt, move_speed)
@@ -203,7 +198,7 @@ while running:
             player_pos = [CELL*2 + CELL//2, CELL*(ROWS-3) + CELL//2]
             score = max(0, score - 50)
 
-    # DRAW FRAME
+    #frame
     screen.fill((0,0,0))
     for r in range(ROWS):
         for c in range(COLS):
@@ -214,12 +209,12 @@ while running:
             elif game_map[r][c] == 2:
                 pygame.draw.circle(screen, (255, 200, 0), (x + CELL//2, y + CELL//2), 3)
 
-    # ghosts
+    #ghosts
     for g in ghosts:
         pygame.draw.circle(screen, (255,0,0),
                            (int(g["pos"][0]), int(g["pos"][1])), CELL//2 - 2)
 
-    # PAC-MAN
+    #pacman
     px, py = int(player_pos[0]), int(player_pos[1])
     mouth = 0.25 if dx != 0 or dy != 0 else 0.05
     ang = 0
@@ -247,3 +242,4 @@ while running:
 running = False
 pygame.quit()
 sys.exit()
+
