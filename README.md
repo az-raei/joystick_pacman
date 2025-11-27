@@ -1,4 +1,4 @@
-# 🟡 Pac-Man Controlled by Arduino Joystick
+# Pac-Man Controlled by Arduino Joystick
 
 A classic **Pac-Man clone in Python (pygame)** controlled using a **physical analog joystick connected to an Arduino**, communicating with the game over **serial (USB)**.
 
@@ -55,7 +55,7 @@ Joystick → Arduino → Serial (USB) → Python → Pygame Window
 
 ---
 
-## 📦 Dependencies
+## Dependencies
 
 Install Python libraries:
 
